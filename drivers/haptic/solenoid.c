@@ -18,6 +18,7 @@
 #include <timer.h>
 #include "solenoid.h"
 #include "haptic.h"
+#include "power.h"
 
 bool     solenoid_on      = false;
 bool     solenoid_buzzing = false;
@@ -32,18 +33,10 @@ void solenoid_buzz_off(void) { haptic_set_buzz(0); }
 
 void solenoid_set_buzz(int buzz) { haptic_set_buzz(buzz); }
 
-void solenoid_dwell_minus(uint8_t solenoid_dwell) {
-    if (solenoid_dwell > 0) solenoid_dwell--;
-}
-
-void solenoid_dwell_plus(uint8_t solenoid_dwell) {
-    if (solenoid_dwell < SOLENOID_MAX_DWELL) solenoid_dwell++;
-}
-
 void solenoid_set_dwell(uint8_t dwell) { solenoid_dwell = dwell; }
 
 void solenoid_stop(void) {
-    writePinLow(SOLENOID_PIN);
+    SOLENOID_PIN_WRITE_INACTIVE();
     solenoid_on      = false;
     solenoid_buzzing = false;
 }
@@ -55,7 +48,7 @@ void solenoid_fire(void) {
     solenoid_on      = true;
     solenoid_buzzing = true;
     solenoid_start   = timer_read();
-    writePinHigh(SOLENOID_PIN);
+    SOLENOID_PIN_WRITE_ACTIVE();
 }
 
 void solenoid_check(void) {
@@ -73,23 +66,26 @@ void solenoid_check(void) {
 
     // Check whether to buzz the solenoid on and off
     if (haptic_config.buzz) {
-        if (elapsed / SOLENOID_MIN_DWELL % 2 == 0) {
+        if ((elapsed % (SOLENOID_BUZZ_ACTUATED + SOLENOID_BUZZ_NONACTUATED)) < SOLENOID_BUZZ_ACTUATED) {
             if (!solenoid_buzzing) {
                 solenoid_buzzing = true;
-                writePinHigh(SOLENOID_PIN);
+                SOLENOID_PIN_WRITE_ACTIVE();
             }
         } else {
             if (solenoid_buzzing) {
                 solenoid_buzzing = false;
-                writePinLow(SOLENOID_PIN);
+                SOLENOID_PIN_WRITE_INACTIVE();
             }
         }
     }
 }
 
 void solenoid_setup(void) {
+    SOLENOID_PIN_WRITE_INACTIVE();
     setPinOutput(SOLENOID_PIN);
-    solenoid_fire();
+    if ((!HAPTIC_OFF_IN_LOW_POWER) || (power_state == POWER_STATE_CONFIGURED)) {
+        solenoid_fire();
+    }
 }
 
-void solenoid_shutdown(void) { writePinLow(SOLENOID_PIN); }
+void solenoid_shutdown(void) { SOLENOID_PIN_WRITE_INACTIVE(); }
