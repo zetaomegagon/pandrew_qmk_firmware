@@ -37,6 +37,23 @@ Communication::~Communication()
     hid_exit();
 }
 
+struct custom_scan {
+    int vid;
+    int pid;
+    const wchar_t *product;
+    const wchar_t *manuf;
+};
+
+static const struct custom_scan custom_list[] = {
+    // The following NathanA VIAL firmwares use pids not allocated by pid.codes, but we must still support:
+    {0x1209, 0xFFF0, L"F62 Keyboard", L"Model F Labs LLC"},
+    {0x1209, 0xFFC0, L"F77 Keyboard", L"Model F Labs LLC"},
+};
+
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
+#endif
+
 std::vector<std::string> Communication::scan()
 {
     QMutexLocker locker(&mutex);
@@ -106,6 +123,26 @@ std::vector<std::string> Communication::scan()
         devinfo = devinfo->next;
     }
     hid_free_enumeration(enu);
+
+    for (int i=0;i<ARRAY_SIZE(custom_list);i++) {
+        enu = hid_enumerate(custom_list[i].vid, custom_list[i].pid);
+        devinfo = enu;
+        while (devinfo != NULL)
+        {
+            if ((NULL != devinfo->manufacturer_string) &&
+                (NULL != devinfo->product_string) &&
+                (0==wcscmp(devinfo->manufacturer_string, custom_list[i].manuf)) &&
+                (0==wcscmp(devinfo->product_string, custom_list[i].product)))
+            {
+                if (devinfo->interface_number == 1)
+                {
+                    ret.push_back(devinfo->path);
+                }
+            }
+            devinfo = devinfo->next;
+        }
+        hid_free_enumeration(enu);
+    }
 
     return ret;
 }
