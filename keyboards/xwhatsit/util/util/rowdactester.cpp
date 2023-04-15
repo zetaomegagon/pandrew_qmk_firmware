@@ -73,14 +73,23 @@ void RowDacTester::update_value(int value)
     const double max_dac_value = this->max_dac;
     const double dac_voltage = max_voltage / max_dac_value * value;
     QString dac_voltage_str;
-    dac_voltage_str.sprintf("%04.2f V", dac_voltage);
+
+#if QT_VERSION >= 0x050600 // Qt 5.6 or over
+    dac_voltage_str = QString::asprintf("%04.2f V", dac_voltage);
+#else
+    dac_voltage_str.sprintf            ("%04.2f V", dac_voltage);
+#endif
     ui->dac_voltage->setText(dac_voltage_str);
     const double pullup = 20;
     const double pulldown = 4.7;
     const double drv = 20;
     const double thresh_voltage = (dac_voltage + max_voltage * drv / pullup) / ( 1. + (1./pulldown + 1./pullup) * drv);
     QString thresh_voltage_str;
-    thresh_voltage_str.sprintf("%04.2f V", thresh_voltage);
+#if QT_VERSION >= 0x050600 // Qt 5.6 or over
+    thresh_voltage_str = QString::asprintf("%04.2f V", thresh_voltage);
+#else
+    thresh_voltage_str.sprintf            ("%04.2f V", thresh_voltage);
+#endif
     ui->threshold_voltage->setText(thresh_voltage_str);
     thread.setDacValue(static_cast<uint16_t>(value));
 }

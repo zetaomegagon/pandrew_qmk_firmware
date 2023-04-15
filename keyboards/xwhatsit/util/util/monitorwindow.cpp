@@ -95,7 +95,7 @@ void MonitorWindow::loadLayout(QString name)
     ui->layoutSel->setEnabled(true);
     if (!keyboard)
     {
-        on_reportMonitorError("Unknown keyboard (you may need to update the util version)!");
+        on_reportMonitorError("Unknown keyboard \"" + name.toStdString() + "\" (you may need to update the util version)!");
         this->close();
         return;
     }

@@ -66,10 +66,7 @@ def handle_layouts(layouth_fn, layoutc_fn, infojson_fn, config_fn):
         for row in range(len(desc)):
             for col in range(len(desc[row])):
                 if desc[row][col] != "KC_NO":
-                    try:
-                        ind = int(desc[row][col])
-                    except ValueError:
-                        raise BaseException("Error row = " + str(row) + " col = " + str(col) + " (in gcc out of " + layouth_fn + ")")
+                    ind = int(desc[row][col])
                     while len(arr) <= ind:
                         arr.append('')
                     arr[ind] = (row, col)
@@ -84,7 +81,7 @@ def handle_layouts(layouth_fn, layoutc_fn, infojson_fn, config_fn):
             if len(arr) <= i:
                 raise BaseException("Error index " + str(i) + " in array " + str(arr))
             if len(arr[i]) < 2:
-                raise BaseException("Error array must have at least two elements: i = " + str(i) + " val=" + str(arr[i]) + " (full arr = " + str(arr) + ")")
+                raise BaseException("Error array must have at least two elements: " + str(arr[i]) + " (full arr = " + str(arr) + ")")
             print ("    { .row = %d, .col = %d, .x = %f, .y = %f, .w = %f, .h = %f }," % (arr[i][0], arr[i][1], x, y, w, h))
         print("};")
         laynames.append((layname, lname))
