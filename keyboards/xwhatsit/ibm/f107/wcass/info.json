@@ -1,0 +1,9 @@
+{
+    "keyboard_name": "IBM 4704 F107",
+    "manufacturer": "Tom Wong-Cornall/wcass/Purdea Andrei",
+    "usb": {
+        "vid": "0x0481",
+        "pid": "0x0002",
+        "device_version": "0.0.1"
+    }
+}
