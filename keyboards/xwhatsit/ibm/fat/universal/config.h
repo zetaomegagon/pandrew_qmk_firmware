@@ -60,3 +60,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define LED_NUM_LOCK_ACTIVE_LOW
 //#define LED_CAPS_LOCK_ACTIVE_LOW
 //#define LED_SCROLL_LOCK_ACTIVE_LOW
+
+#define DEBUG_MATRIX_SCAN_RATE
