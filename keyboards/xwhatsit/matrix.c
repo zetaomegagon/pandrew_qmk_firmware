@@ -790,6 +790,8 @@ bool cal_stats_printed = false;
 bool keyboard_scan_enabled = 1;
 
 #ifndef NO_PRINT
+int stack_used(void);
+
 void matrix_print_stats(void)
 {
     uint8_t row, cal;
@@ -799,6 +801,7 @@ void matrix_print_stats(void)
         uint32_t time = timer_read32();
         if (time >= 10 * 1000UL) { // after 10 seconds
             uprintf("Calibration took: %u ms\n", cal_time);
+            uprintf("Stack used: %d bytes\n", stack_used());
             uprintf("Cal All Zero = %u, Cal All Ones = %u\n", cal_tr_allzero, cal_tr_allone);
             for (cal=0;cal<CAPSENSE_CAL_BINS;cal++)
             {
